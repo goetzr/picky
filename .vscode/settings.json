@@ -1,3 +1,7 @@
 {
-  "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools"
+  "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+  "cmake.configureArgs": [
+    "BUILD_SHARED_LIBS=YES"
+  ],
+  "cmake.buildDirectory": "${userHome}/builds/picky/${buildType}"
 }

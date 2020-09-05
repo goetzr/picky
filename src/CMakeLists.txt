@@ -1,9 +1,10 @@
 add_library(picky
-            BinaryFileReader.cpp ${picky_SOURCE_DIR}/include/BinaryFileReader.h)
+            BinaryFileReader.cpp ${picky_SOURCE_DIR}/include/picky/BinaryFileReader.h)
 add_library(picky::picky ALIAS picky)
 
-target_include_directories(picky PUBLIC
-  ${picky_SOURCE_DIR}/include
+target_include_directories(picky
+	INTERFACE ${picky_SOURCE_DIR}/include
+	PRIVATE ${picky_SOURCE_DIR}/include/picky
 )
 target_link_libraries(picky PRIVATE fmt::fmt)
 
