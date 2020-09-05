@@ -4,6 +4,11 @@ project(picky
         LANGUAGES CXX
 )
 
+# Make symbols hidden by default.
+set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+# Make inlined functions hidden by default.
+set(CMAKE_CXX_VISIBILITY_INLINES_HIDDEN TRUE)
+
 add_subdirectory(dependencies)
 
 add_subdirectory(src)
