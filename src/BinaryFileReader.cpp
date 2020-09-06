@@ -1,5 +1,5 @@
 #include "BinaryFileReader.h"
 
-BinaryFileReader::BinaryFileReader(char const * path) {
+picky::BinaryFileReader::BinaryFileReader(char const * path) {
   
 }
