@@ -1,7 +1,7 @@
 #pragma once
 
 #include "picky_export.h"
-#include "endian.h"
+#include "picky_endian.h"
 
 #include <cstdint>
 #include <cstdio>

@@ -2,5 +2,6 @@
 #include "picky/BinaryFileReader.h"
 
 TEST_CASE( "Constructor", "[BinaryFileReader]" ) {
-	BinaryFileReader reader("test.bin");
+	auto file = fopen("test.bin", "rb");
+	picky::BinaryFileReader<picky::Endian::LITTLE> reader{ file };
 }

@@ -10,5 +10,5 @@ namespace picky {
 
    private:
     static std::string BuildErrorMessage(long offset, int num_bytes);
-  }
+  };
 }

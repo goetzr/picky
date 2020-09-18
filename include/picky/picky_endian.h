@@ -11,14 +11,14 @@ enum class PICKY_EXPORT Endian {
 	BIG
 };
 
-static constexpr std::uint8_t endian_check[4] = { 1, 2, 3, 4 };
-static constexpr std::uint32_t big_endian_value = 0x01020304;
-static constexpr std::uint32_t little_endian_value = 0x04030201;
-constexpr auto HostByteOrder() {
-	return ((std::uint32_t)endian_check == big_endian_value) ? Endian::BIG : Endian::LITTLE;
+static std::uint8_t endian_values[] = { 1, 2, 3, 4 };
+auto GetHostByteOrder() {
+	auto as_uint = *reinterpret_cast<std::uint32_t *>(endian_values);
+	return as_uint == 0x04030201 ? Endian::LITTLE : Endian::BIG;
 }
+auto HostByteOrder = GetHostByteOrder();
 
-constexpr std::int16_t SwapByteOrder(std::int16_t data) {
+std::int16_t SwapByteOrder(std::int16_t data) {
 	#ifdef __GNUC__	// GCC
 		return static_cast<std::int16_t>(__builtin_bswap16(static_cast<std::uint16_t>(data)));
 	#elif _MSC_VER	// MSVC
@@ -28,7 +28,7 @@ constexpr std::int16_t SwapByteOrder(std::int16_t data) {
 	#endif
 }
 
-constexpr std::int32_t SwapByteOrder(std::int32_t data) {
+std::int32_t SwapByteOrder(std::int32_t data) {
 	#ifdef __GNUC__	// GCC
 		return static_cast<std::int32_t>(__builtin_bswap32(static_cast<std::uint32_t>(data)));
 	#elif _MSC_VER	// MSVC
@@ -38,7 +38,7 @@ constexpr std::int32_t SwapByteOrder(std::int32_t data) {
 	#endif
 }
 
-constexpr std::int64_t SwapByteOrder(std::int64_t data) {
+std::int64_t SwapByteOrder(std::int64_t data) {
 	#ifdef __GNUC__	// GCC
 		return static_cast<std::int64_t>(__builtin_bswap64(static_cast<std::uint64_t>(data)));
 	#elif _MSC_VER	// MSVC
@@ -48,7 +48,7 @@ constexpr std::int64_t SwapByteOrder(std::int64_t data) {
 	#endif
 }
 
-constexpr std::uint16_t SwapByteOrder(std::uint16_t data) {
+std::uint16_t SwapByteOrder(std::uint16_t data) {
 	#ifdef __GNUC__	// GCC
 		return __builtin_bswap16(data);
 	#elif _MSC_VER	// MSVC
@@ -58,7 +58,7 @@ constexpr std::uint16_t SwapByteOrder(std::uint16_t data) {
 	#endif
 }
 
-constexpr std::uint32_t SwapByteOrder(std::uint32_t data) {
+std::uint32_t SwapByteOrder(std::uint32_t data) {
 	#ifdef __GNUC__	// GCC
 		return __builtin_bswap32(data);
 	#elif _MSC_VER	// MSVC
@@ -68,7 +68,7 @@ constexpr std::uint32_t SwapByteOrder(std::uint32_t data) {
 	#endif
 }
 
-constexpr std::uint64_t SwapByteOrder(std::uint64_t data) {
+std::uint64_t SwapByteOrder(std::uint64_t data) {
 	#ifdef __GNUC__	// GCC
 		return __builtin_bswap64(data);
 	#elif _MSC_VER	// MSVC
