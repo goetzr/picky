@@ -4,12 +4,9 @@
 
 using namespace std;
 
-string picky::ReadError::BuildErrorMessage(long offset, int num_bytes) {
-  // TODO: Fix formatting.
-  return fmt::format("Failed to read %d bytes at offset 0x%08x.")
-}
-
 picky::ReadError::ReadError(long offset, int num_bytes)
-  : runtime_error() {
+  : runtime_error{ BuildErrorMessage(offset, num_bytes) } {}
 
+string picky::ReadError::BuildErrorMessage(long offset, int num_bytes) {
+  return fmt::format("Failed to read {} bytes at offset {#08x}.", num_bytes, offset);
 }

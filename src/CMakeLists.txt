@@ -1,7 +1,8 @@
 add_library(picky
             ${picky_SOURCE_DIR}/include/picky/endian.h
-            BinaryFileReader.cpp ${picky_SOURCE_DIR}/include/picky/BinaryFileReader.h)
-            ReadError.cpp ${picky_SOURCE_DIR}/include/picky/ReadError.h)
+            BinaryFileReader.cpp ${picky_SOURCE_DIR}/include/picky/BinaryFileReader.h
+            ReadError.cpp ${picky_SOURCE_DIR}/include/picky/ReadError.h
+            SeekError.cpp ${picky_SOURCE_DIR}/include/picky/SeekError.h)
 add_library(picky::picky ALIAS picky)
 
 target_include_directories(picky

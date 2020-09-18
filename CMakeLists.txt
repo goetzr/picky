@@ -21,6 +21,10 @@ project(picky
         LANGUAGES CXX
 )
 
+set(CMAKE_CXX_STANDARD					17)
+set(CMAKE_CXX_STANDARD_REQUIRED YES)
+set(CMAKE_CXX_EXTENSION					NO)
+
 # TODO: Set enable warnings
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
