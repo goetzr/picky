@@ -115,5 +115,30 @@ void picky::BinaryFileReader<DefaultByteOrder>::Read(uint64_t& data, Endian byte
   offset_ += size;
 }
 
+template<picky::Endian DefaultByteOrder>
+void picky::BinaryFileReader<DefaultByteOrder>::Read(std::string& data) {
+  char c;
+  while (true) {
+    if (fread(&c, 1, 1, file_) != 1) {
+      throw ReadError(offset_, 1);
+    }
+    ++offset_;
+    if (c == '\0') {
+      break;
+    }
+    data += c;
+  }
+}
+
+template<picky::Endian DefaultByteOrder>
+void picky::BinaryFileReader<DefaultByteOrder>::Read(std::string& data, int len) {
+  data.reserve(len);
+  data.assign(len, '\0');
+  if (fread(data.data(), 1, len, file_) != len) {
+    throw picky::ReadError(offset_, len);
+  }
+  offset_ += len;
+}
+
 template class picky::BinaryFileReader<picky::Endian::LITTLE>;
 template class picky::BinaryFileReader<picky::Endian::BIG>;

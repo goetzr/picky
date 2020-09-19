@@ -215,3 +215,37 @@ TEST_CASE( "Read using non-default endianness", "[BinaryFileReader]" ) {
 		REQUIRE( data == 0xffeeddccbbaa9988 );
 	}
 }
+
+TEST_CASE( "Read strings", "[BinaryFileReader]" ) {
+	auto le_file = fopen("test_files/test.bin", "rb");
+	REQUIRE( le_file != nullptr );
+	BinaryFileReader<Endian::LITTLE> le_reader{ le_file };
+
+	auto be_file = fopen("test_files/test.bin", "rb");
+	REQUIRE( be_file != nullptr );
+	BinaryFileReader<Endian::BIG> be_reader{ be_file };
+
+	SECTION( "Read NULL-terminated string" ) {
+		string le_data;
+		le_reader.Seek(0xf);
+		le_reader.Read(le_data);
+		REQUIRE( le_data == "This is a test string." );
+
+		string be_data;
+		be_reader.Seek(0xf);
+		be_reader.Read(be_data);
+		REQUIRE( be_data == "This is a test string." );
+	}
+
+	SECTION( "Read length-specified string" ) {
+		string le_data;
+		le_reader.Seek(0xf);
+		le_reader.Read(le_data, 14);
+		REQUIRE( le_data == "This is a test" );
+
+		string be_data;
+		be_reader.Seek(0xf);
+		be_reader.Read(be_data, 14);
+		REQUIRE( be_data == "This is a test" );
+	}
+}

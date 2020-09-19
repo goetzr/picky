@@ -38,7 +38,8 @@ class PICKY_EXPORT BinaryFileReader {
 	void Read(std::uint32_t& data, Endian byte_order);
 	void Read(std::uint64_t& data, Endian byte_order);
 
-	//void Read(std::string& data, int len);
+	void Read(std::string& data);
+	void Read(std::string& data, int len);
 };
 
 }
