@@ -1,2 +1,5 @@
 add_subdirectory(fmt)
-add_subdirectory(Catch2)
+if (${PICKY_TEST})
+  add_subdirectory(Catch2)
+  add_subdirectory(crystal)
+endif()
