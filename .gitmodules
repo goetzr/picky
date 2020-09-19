@@ -4,3 +4,6 @@
 [submodule "dependencies/Catch2"]
 	path = dependencies/Catch2
 	url = https://github.com/catchorg/Catch2.git
+[submodule "dependencies/crystal"]
+	path = dependencies/crystal
+	url = https://github.com/goetzr/crystal.git
