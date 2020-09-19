@@ -1,3 +1,5 @@
+file(COPY test_files DESTINATION .)
+
 add_executable(test_picky main.cpp
 	BinaryFileReader_tests.cpp
 )

@@ -4,6 +4,9 @@
 
 using namespace std;
 
+picky::SeekError::SeekError(std::string const& msg)
+  : runtime_error(msg) {}
+
 picky::SeekError::SeekError(long offset)
   : runtime_error{ BuildErrorMessage(offset) } {}
   
