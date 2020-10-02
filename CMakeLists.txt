@@ -12,7 +12,7 @@ endif()
 # CMAKE_BUILD_TYPE itself (it does so for nmake).
 if (MASTER_PROJECT AND NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE Release CACHE STRING
-			"Choose the type of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel."
+		"Choose the type of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel."
 	)
 endif()
 
@@ -23,7 +23,7 @@ project(picky
 
 set(CMAKE_CXX_STANDARD					17)
 set(CMAKE_CXX_STANDARD_REQUIRED YES)
-set(CMAKE_CXX_EXTENSION					NO)
+set(CMAKE_CXX_EXTENSIONS				NO)
 
 # TODO: Set enable warnings
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

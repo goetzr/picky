@@ -1,0 +1,7 @@
+#include "ByteOrder.h"
+
+#if @is_host_big_endian@
+  constexpr picky::ByteOrder HostByteOrder = picky::ByteOrder::BIG;
+#else
+  constexpr picky::ByteOrder HostByteOrder = picky::ByteOrder::LITTLE;
+#endif

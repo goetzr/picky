@@ -1,9 +1,5 @@
 {
   "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
-  "cmake.configureArgs": [
-    "BUILD_SHARED_LIBS=YES"
-  ],
-  "cmake.buildDirectory": "${userHome}/builds/picky/${buildType}",
   "files.associations": {
     "array": "cpp",
     "string": "cpp",
@@ -67,5 +63,8 @@
     "thread": "cpp",
     "typeinfo": "cpp",
     "variant": "cpp"
+  },
+  "cmake.configureSettings": {
+    "BUILD_SHARED_LIBS": "TRUE"
   }
 }

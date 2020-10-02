@@ -1,126 +1,187 @@
 #include "BinaryFileReader.h"
-#include "ReadError.h"
-#include "SeekError.h"
+#include "OpenFileError.h"
+#include "ReadFileError.h"
+#include "SeekFileError.h"
+#include "HostByteOrder.h"
 
+using namespace picky;
 using namespace std;
 
-template<picky::Endian DefaultByteOrder>
-picky::BinaryFileReader<DefaultByteOrder>::BinaryFileReader(std::FILE* file) :
-		file_{ file },
-		size_{ 0L },
-		offset_{ 0L } {
-			auto seek1 = fseek(file, 0, SEEK_END);
-			size_ = ftell(file);
-			auto seek2 = fseek(file, 0, SEEK_SET);
-			if (seek1 != 0 || seek2 != 0) {
-				throw SeekError("Failed to seek the file to determine its size.");
-			}
-		}
+template<typename T>
+inline int ReadFromFile(FILE* file, T& data, long offset) {
+  size_t const size = sizeof(T);
+  if (fread(&data, 1, size, file) != size) {
+    throw ReadFileError(offset, size);
+  }
+  return size;
+}
 
-template<picky::Endian DefaultByteOrder>
-void picky::BinaryFileReader<DefaultByteOrder>::Seek(long offset) {
+FILE* OpenFile(string const& file_path) {
+  auto f = fopen(file_path.c_str(), "rb");
+  if (f == nullptr) {
+    throw OpenFileError(file_path);
+  }
+  return f;
+}
+
+long GetFileSize(FILE* file) {
+  auto res1 = fseek(file, 0, SEEK_END);
+  auto size = ftell(file);
+  auto res2 = fseek(file, 0, SEEK_SET);
+  if (res1 != 0 || res2 != 0) {
+    throw SeekFileError("Failed to seek the file to determine its size.");
+  }
+  return size;
+}
+
+template<ByteOrder FileByteOrder>
+BinaryFileReader<FileByteOrder>::BinaryFileReader(string const& file_path) :
+		file_{ OpenFile(file_path) },
+		size_{ GetFileSize(file_) },
+		offset_{ 0L } {}
+
+template<ByteOrder FileByteOrder>
+BinaryFileReader<FileByteOrder>::BinaryFileReader(BinaryFileReader&& rhs) :
+  file_ { rhs.file_ },
+  size_ { rhs.size_ },
+  offset_ { rhs.offset_ } {
+    rhs.file_ = nullptr;
+    rhs.size_ = 0;
+    rhs.offset_ = 0;
+  }
+  
+template<ByteOrder FileByteOrder>
+BinaryFileReader<FileByteOrder>& BinaryFileReader<FileByteOrder>::operator=(BinaryFileReader&& rhs) {
+  file_ = rhs.file_;
+  size_ = rhs.size_;
+  offset_ = rhs.offset_;
+  rhs.file_ = nullptr;
+  rhs.size_ = 0;
+  rhs.offset_ = 0;
+
+  return *this;
+}
+
+template<ByteOrder FileByteOrder>
+void BinaryFileReader<FileByteOrder>::Seek(long offset) const {
   if (offset >= size_ || fseek(file_, offset, SEEK_SET) != 0) {
-    throw picky::SeekError(offset);
+    throw SeekFileError(offset);
   }
   offset_ = offset;
 }
 
-template<picky::Endian DefaultByteOrder>
-void picky::BinaryFileReader<DefaultByteOrder>::Read(int8_t& data) {
-  auto const size = 1;
-  if (fread(&data, 1, size, file_) != size) {
-    throw picky::ReadError(offset_, size);
-  }
-  ++offset_;
+template<ByteOrder FileByteOrder>
+void BinaryFileReader<FileByteOrder>::Read(int8_t& data) const {
+  offset_ += ReadFromFile(file_, data, offset_);
 }
 
-template<picky::Endian DefaultByteOrder>
-void picky::BinaryFileReader<DefaultByteOrder>::Read(int16_t& data, Endian byte_order) {
-  auto const size = 2;
-  if (fread(&data, 1, size, file_) != size) {
-    throw picky::ReadError(offset_, size);
-  }
-  if (byte_order != HostByteOrder) {
+template<ByteOrder FileByteOrder>
+void BinaryFileReader<FileByteOrder>::Read(int16_t & data) const {
+  offset_ += ReadFromFile(file_, data, offset_);
+
+  if constexpr (FileByteOrder != HostByteOrder)
     data = SwapByteOrder(data);
-  }
-  offset_ += size;
 }
 
-template<picky::Endian DefaultByteOrder>
-void picky::BinaryFileReader<DefaultByteOrder>::Read(int32_t& data, Endian byte_order) {
-  auto const size = 4;
-  if (fread(&data, 1, size, file_) != size) {
-    throw picky::ReadError(offset_, size);
-  }
-  if (byte_order != HostByteOrder) {
+template<ByteOrder FileByteOrder>
+void BinaryFileReader<FileByteOrder>::Read(int32_t & data) const {
+  offset_ += ReadFromFile(file_, data, offset_);
+
+  if constexpr (FileByteOrder != HostByteOrder)
     data = SwapByteOrder(data);
-  }
-  offset_ += size;
 }
 
-template<picky::Endian DefaultByteOrder>
-void picky::BinaryFileReader<DefaultByteOrder>::Read(int64_t& data, Endian byte_order) {
-  auto const size = 8;
-  if (fread(&data, 1, size, file_) != size) {
-    throw picky::ReadError(offset_, size);
-  }
-  if (byte_order != HostByteOrder) {
+template<ByteOrder FileByteOrder>
+void BinaryFileReader<FileByteOrder>::Read(int64_t & data) const {
+  offset_ += ReadFromFile(file_, data, offset_);
+
+  if constexpr (FileByteOrder != HostByteOrder)
     data = SwapByteOrder(data);
-  }
-  offset_ += size;
 }
 
-template<picky::Endian DefaultByteOrder>
-void picky::BinaryFileReader<DefaultByteOrder>::Read(uint8_t& data, Endian byte_order) {
-  auto const size = 1;
-  if (fread(&data, 1, size, file_) != size) {
-    throw picky::ReadError(offset_, size);
-  }
-  ++offset_;
+template<ByteOrder FileByteOrder>
+void BinaryFileReader<FileByteOrder>::Read(uint8_t& data) const {
+  offset_ += ReadFromFile(file_, data, offset_);
 }
 
-template<picky::Endian DefaultByteOrder>
-void picky::BinaryFileReader<DefaultByteOrder>::Read(uint16_t& data, Endian byte_order) {
-  auto const size = 2;
-  if (fread(&data, 1, size, file_) != size) {
-    throw picky::ReadError(offset_, size);
-  }
-  if (byte_order != HostByteOrder) {
+template<ByteOrder FileByteOrder>
+void BinaryFileReader<FileByteOrder>::Read(uint16_t & data) const {
+  offset_ += ReadFromFile(file_, data, offset_);
+
+  if constexpr (FileByteOrder != HostByteOrder)
     data = SwapByteOrder(data);
-  }
-  offset_ += size;
 }
 
-template<picky::Endian DefaultByteOrder>
-void picky::BinaryFileReader<DefaultByteOrder>::Read(uint32_t& data, Endian byte_order) {
-  auto const size = 4;
-  if (fread(&data, 1, size, file_) != size) {
-    throw picky::ReadError(offset_, size);
-  }
-  if (byte_order != HostByteOrder) {
+template<ByteOrder FileByteOrder>
+void BinaryFileReader<FileByteOrder>::Read(uint32_t & data) const {
+  offset_ += ReadFromFile(file_, data, offset_);
+
+  if constexpr (FileByteOrder != HostByteOrder)
     data = SwapByteOrder(data);
-  }
-  offset_ += size;
 }
 
-template<picky::Endian DefaultByteOrder>
-void picky::BinaryFileReader<DefaultByteOrder>::Read(uint64_t& data, Endian byte_order) {
-  auto const size = 8;
-  if (fread(&data, 1, size, file_) != size) {
-    throw picky::ReadError(offset_, size);
-  }
-  if (byte_order != HostByteOrder) {
+template<ByteOrder FileByteOrder>
+void BinaryFileReader<FileByteOrder>::Read(uint64_t & data) const {
+  offset_ += ReadFromFile(file_, data, offset_);
+
+  if constexpr (FileByteOrder != HostByteOrder)
     data = SwapByteOrder(data);
-  }
-  offset_ += size;
 }
 
-template<picky::Endian DefaultByteOrder>
-void picky::BinaryFileReader<DefaultByteOrder>::Read(std::string& data) {
+template<ByteOrder FileByteOrder>
+void BinaryFileReader<FileByteOrder>::Read(int16_t& data, ByteOrder byte_order) const {
+  offset_ += ReadFromFile(file_, data, offset_);
+
+  if (byte_order != HostByteOrder)
+    data = SwapByteOrder(data);
+}
+
+template<ByteOrder FileByteOrder>
+void BinaryFileReader<FileByteOrder>::Read(int32_t& data, ByteOrder byte_order) const {
+  offset_ += ReadFromFile(file_, data, offset_);
+
+  if (byte_order != HostByteOrder)
+    data = SwapByteOrder(data);
+}
+
+template<ByteOrder FileByteOrder>
+void BinaryFileReader<FileByteOrder>::Read(int64_t& data, ByteOrder byte_order) const {
+  offset_ += ReadFromFile(file_, data, offset_);
+
+  if (byte_order != HostByteOrder)
+    data = SwapByteOrder(data);
+}
+
+template<ByteOrder FileByteOrder>
+void BinaryFileReader<FileByteOrder>::Read(uint16_t& data, ByteOrder byte_order) const {
+  offset_ += ReadFromFile(file_, data, offset_);
+
+  if (byte_order != HostByteOrder)
+    data = SwapByteOrder(data);
+}
+
+template<ByteOrder FileByteOrder>
+void BinaryFileReader<FileByteOrder>::Read(uint32_t& data, ByteOrder byte_order) const {
+  offset_ += ReadFromFile(file_, data, offset_);
+
+  if (byte_order != HostByteOrder)
+    data = SwapByteOrder(data);
+}
+
+template<ByteOrder FileByteOrder>
+void BinaryFileReader<FileByteOrder>::Read(uint64_t& data, ByteOrder byte_order) const {
+  offset_ += ReadFromFile(file_, data, offset_);
+
+  if (byte_order != HostByteOrder)
+    data = SwapByteOrder(data);
+}
+
+template<ByteOrder FileByteOrder>
+void BinaryFileReader<FileByteOrder>::Read(string& data) const {
   char c;
   while (true) {
     if (fread(&c, 1, 1, file_) != 1) {
-      throw ReadError(offset_, 1);
+      throw ReadFileError(offset_, 1);
     }
     ++offset_;
     if (c == '\0') {
@@ -130,15 +191,15 @@ void picky::BinaryFileReader<DefaultByteOrder>::Read(std::string& data) {
   }
 }
 
-template<picky::Endian DefaultByteOrder>
-void picky::BinaryFileReader<DefaultByteOrder>::Read(std::string& data, int len) {
+template<ByteOrder FileByteOrder>
+void BinaryFileReader<FileByteOrder>::Read(string& data, int len) const {
   data.reserve(len);
   data.assign(len, '\0');
   if (fread(data.data(), 1, len, file_) != len) {
-    throw picky::ReadError(offset_, len);
+    throw ReadFileError(offset_, len);
   }
   offset_ += len;
 }
 
-template class picky::BinaryFileReader<picky::Endian::LITTLE>;
-template class picky::BinaryFileReader<picky::Endian::BIG>;
+template class BinaryFileReader<ByteOrder::LITTLE>;
+template class BinaryFileReader<ByteOrder::BIG>;

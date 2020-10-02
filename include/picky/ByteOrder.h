@@ -6,17 +6,10 @@
 
 namespace picky {
 	
-enum class PICKY_EXPORT Endian {
+enum class PICKY_EXPORT ByteOrder {
 	LITTLE,
 	BIG
 };
-
-inline auto GetHostByteOrder() {
-	std::uint8_t endian_values[] = { 1, 2, 3, 4 };
-	auto const as_uint = *reinterpret_cast<std::uint32_t const*>(endian_values);
-	return as_uint == 0x04030201 ? Endian::LITTLE : Endian::BIG;
-}
-static auto HostByteOrder = GetHostByteOrder();
 
 inline std::int16_t SwapByteOrder(std::int16_t data) {
 	#ifdef __GNUC__	// GCC
